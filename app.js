@@ -410,6 +410,8 @@ document.querySelectorAll('#granularity button').forEach(b => b.onclick = () => 
 const dbModal = document.getElementById('dbModal');
 document.getElementById('dbConnect').onclick = () => dbModal.hidden = false;
 document.getElementById('dbCancel').onclick = () => dbModal.hidden = true;
+dbModal.addEventListener('click', e => { if (e.target === dbModal) dbModal.hidden = true; });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') dbModal.hidden = true; });
 document.getElementById('dbRun').onclick = () => {
   dbModal.hidden = true;
   toast('Querying database…');
@@ -417,4 +419,15 @@ document.getElementById('dbRun').onclick = () => {
 };
 
 // boot with sample data so the dashboard is alive immediately
-loadData(generateSample(), 'Sample dataset');
+try {
+  if (typeof Chart === 'undefined') throw new Error('Chart.js failed to load (vendor/chart.umd.min.js)');
+  if (typeof XLSX === 'undefined') throw new Error('SheetJS failed to load (vendor/xlsx.full.min.js)');
+  loadData(generateSample(), 'Sample dataset');
+} catch (err) {
+  console.error(err);
+  document.getElementById('kpis').innerHTML =
+    `<div class="card span-3" style="grid-column:1/-1"><h3>⚠️ Dashboard failed to start</h3>
+     <p class="muted" style="margin-top:8px">${err.message}.</p>
+     <p class="muted" style="margin-top:6px">Make sure you opened the page via the local server
+     (<b>http://localhost:8000</b>) and that the <b>vendor/</b> folder sits next to index.html.</p></div>`;
+}

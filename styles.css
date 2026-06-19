@@ -136,6 +136,7 @@ tbody tr:hover{background:var(--panel-2)}
 
 /* Modal */
 .modal-backdrop{position:fixed;inset:0;background:rgba(5,7,18,.7);backdrop-filter:blur(4px);display:grid;place-items:center;z-index:50}
+.modal-backdrop[hidden]{display:none}
 .modal{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:24px;width:440px;max-width:92vw;box-shadow:var(--shadow)}
 .modal h3{font-size:18px;margin-bottom:8px}
 .modal p{margin-bottom:16px;font-size:13px;line-height:1.5}
