@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sales &amp; Revenue Analytics</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%236366f1'/%3E%3Cpath d='M5 16l4-5 3 3 5-7' stroke='white' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">◢◤</div>
+      <div>
+        <div class="brand-name">SalesScope</div>
+        <div class="brand-sub">Revenue Analytics</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Data source</div>
+      <label class="btn-import">
+        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls" hidden />
+        <span class="ico">⤓</span> Import CSV / Excel
+      </label>
+      <button class="btn-ghost" id="loadSample">Load sample data</button>
+      <button class="btn-ghost" id="dbConnect">Connect database…</button>
+      <div class="src-status" id="srcStatus">No data loaded</div>
+    </div>
+
+    <div class="panel" id="slicerPanel">
+      <div class="panel-title">Filters &amp; Slicers</div>
+
+      <div class="field">
+        <label>Date range</label>
+        <div class="row">
+          <input type="date" id="dateFrom" />
+          <input type="date" id="dateTo" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Region</label>
+        <div class="slicer" id="slicerRegion"></div>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <div class="slicer" id="slicerCategory"></div>
+      </div>
+      <div class="field">
+        <label>Segment</label>
+        <div class="slicer" id="slicerSegment"></div>
+      </div>
+
+      <button class="btn-ghost" id="resetFilters">Reset all filters</button>
+    </div>
+
+    <div class="sidebar-foot">Built for sales &amp; revenue analysis</div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <h1>Sales &amp; Revenue Dashboard</h1>
+        <p id="subtitle">Interactive analysis of performance, trends &amp; products</p>
+      </div>
+      <div class="topbar-actions">
+        <div class="seg" id="granularity">
+          <button data-g="day">Day</button>
+          <button data-g="month" class="active">Month</button>
+          <button data-g="quarter">Quarter</button>
+        </div>
+        <button class="btn-ghost" id="exportBtn">Export view</button>
+      </div>
+    </header>
+
+    <section class="kpis" id="kpis"></section>
+
+    <section class="grid">
+      <div class="card span-2">
+        <div class="card-head">
+          <h3>Revenue Trend</h3>
+          <div class="card-sub" id="trendSub"></div>
+        </div>
+        <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Revenue by Category</h3></div>
+        <div class="chart-wrap"><canvas id="categoryChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>Region Performance</h3></div>
+        <div class="chart-wrap"><canvas id="regionChart"></canvas></div>
+      </div>
+
+      <div class="card span-2">
+        <div class="card-head">
+          <h3>Top Products</h3>
+          <div class="card-sub">Ranked by revenue contribution</div>
+        </div>
+        <div class="chart-wrap tall"><canvas id="productChart"></canvas></div>
+      </div>
+
+      <div class="card span-3">
+        <div class="card-head">
+          <h3>Transaction Detail</h3>
+          <div class="card-sub" id="tableSub"></div>
+        </div>
+        <div class="table-wrap">
+          <table id="dataTable">
+            <thead></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- DB connect modal (simulated) -->
+<div class="modal-backdrop" id="dbModal" hidden>
+  <div class="modal">
+    <h3>Connect to database</h3>
+    <p class="muted">Enter a connection string. This demo simulates a query against a sales table and streams rows into the dashboard.</p>
+    <input type="text" id="dbConn" placeholder="postgres://user:pass@host:5432/sales" />
+    <input type="text" id="dbQuery" value="SELECT * FROM sales_orders" />
+    <div class="modal-actions">
+      <button class="btn-ghost" id="dbCancel">Cancel</button>
+      <button class="btn-import" id="dbRun"><span class="ico">⚡</span> Run query</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
