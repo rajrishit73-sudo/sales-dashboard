@@ -1,0 +1,91 @@
+// Lumen Studio data model.
+//
+// Local dev defaults to SQLite so `npm run setup` works with zero services.
+// To deploy on Postgres, change `provider` to "postgresql" and point
+// DATABASE_URL at your database (see README -> Deploying).
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String  @id @default(cuid())
+  email        String  @unique
+  passwordHash String
+  name         String?
+
+  // Billing / quota. `plan` is a PLANS key from src/lib/plans.ts.
+  plan                 String    @default("free")
+  credits              Int       @default(25)
+  creditsResetAt       DateTime?
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  generations  Generation[]
+  creditEntries CreditEntry[]
+}
+
+model Generation {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // txt2img | img2img | upscale
+  mode           String
+  prompt         String
+  negativePrompt String?
+  preset         String?
+
+  width     Int   @default(1024)
+  height    Int   @default(1024)
+  steps     Int   @default(30)
+  guidance  Float @default(7)
+  seed      Int?
+  strength  Float?
+  scale     Int?
+
+  sourceImageUrl String?
+  provider       String
+  model          String
+
+  // pending | succeeded | failed
+  status      String  @default("pending")
+  error       String?
+  imageUrl    String?
+  creditsCost Int     @default(1)
+  favorite    Boolean @default(false)
+  durationMs  Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([userId, status])
+}
+
+model CreditEntry {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  delta  Int
+  reason String
+  meta   String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+// Stripe delivers webhooks at-least-once; this makes handling idempotent.
+model WebhookEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
+}
