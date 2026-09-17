@@ -12,7 +12,7 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "db:seed": "node --experimental-strip-types prisma/seed.ts",
+    "db:seed": "node --experimental-strip-types prisma/seed.mts",
     "setup": "prisma generate && prisma db push && npm run db:seed",
     "stripe:listen": "stripe listen --forward-to localhost:3000/api/billing/webhook"
   },
